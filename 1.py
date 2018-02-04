@@ -36,11 +36,11 @@ class MyListener(StreamListener):
     def __init__(self):
         #self.num_tweets = 0;
         self.start_time = time.time()
-        self.limit = 2;
+        self.limit = 30;
 
     def on_data(self,data):
         try:
-            with open('python_8.json','a') as f:
+            with open('python_9.json','a') as f:
                 if ((time.time() - self.start_time) < self.limit):
                     f.write(data)
                     return True
