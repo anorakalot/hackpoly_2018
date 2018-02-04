@@ -29,6 +29,7 @@ def process_or_store(tweet):
 for status in tweepy.Cursor(api.home_timeline).items(10):
     process_or_store(status._json)
 '''
+
 #remakes Mylistener class in StreamListener class in tweepy
 class MyListener(StreamListener):
     #opens data and writes it to a file
@@ -37,10 +38,13 @@ class MyListener(StreamListener):
         #self.num_tweets = 0;
         self.start_time = time.time()
         self.limit = 30;
+        file_f = open('python_temp.json', 'w')
+        file_f.truncate()
+        file_f.close()
 
     def on_data(self,data):
         try:
-            with open('python_9.json','a') as f:
+            with open('python_temp.json','a') as f:
                 if ((time.time() - self.start_time) < self.limit):
                     f.write(data)
                     return True
@@ -58,6 +62,7 @@ class MyListener(StreamListener):
 
 filter_str = str(input("which filter?..."))
 #makes a new stream object
+
 twitter_stream = Stream(auth,MyListener())
 #makes the .json file filled with twitter json data
-twitter_stream.filter(track=[filter_str])
+twitter_stream.filter(languages=["en"],track=[filter_str])
