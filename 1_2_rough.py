@@ -256,7 +256,6 @@ def print_data(file_to_open):
         '''
         plt.bar(range(len(term_max[:10])),list(term_max[:10].values()),align = 'center')
         plt.xticks(range(len(term_max[:10])),list(dict(count_all_minus_stop.most_common(10)).keys()))
-
         plt.show()
         '''
     #Starting Semantic analysis
@@ -319,7 +318,7 @@ def print_data(file_to_open):
     top_neg = semantic_sorted[-10:]
 
 
-    title_4 = "Top Semantically Positive terms in tweets"
+    title_4 = "Top Sentimental Positive terms in tweets"
     str_4 = str(top_pos)
     msgbox(str_4,title_4)
     pos_term = list(zip(*top_pos))[0]
@@ -330,7 +329,7 @@ def print_data(file_to_open):
     plt.ylabel("Positive Semantic Orientation Score")
     plt.show()
 
-    title_5 = "Top Semantically Negative terms in tweets"
+    title_5 = "Top Semantical Negative terms in tweets"
     str_5 = str(top_neg)
     msgbox(str_5,title_5)
 
@@ -378,9 +377,16 @@ while(choice != "exit"):
         file_to_make_stream = str(enterbox("name of new file? (Beware adding in the same string for a previously existing file will erase that file!)"))
         #makes a new stream object
         time_limit = int(enterbox("Please enter seconds to make for your new tweet stream "))
-        twitter_stream = Stream(auth,MyListener(file_to_make_stream,time_limit))
-        #makes the .json file filled with twitter json data
-        twitter_stream.filter(languages=["en"],track=[filter_str])
+        msg = "Do you want to continue?"
+        title = "Please Confirm"
+        if ccbox(msg, title):     # show a Continue/Cancel dialog
+            twitter_stream = Stream(auth,MyListener(file_to_make_stream,time_limit))
+            #makes the .json file filled with twitter json data
+            twitter_stream.filter(languages=["en"],track=[filter_str])
+
+            pass  # user chose Continue
+        else:  # user chose Cancel
+            choice = "dummy_value"
 
     elif  (choice == "list_directory"):
         os_string = os.listdir()
