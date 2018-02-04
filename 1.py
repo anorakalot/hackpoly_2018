@@ -4,6 +4,7 @@ import json
 from tweepy import Stream
 from tweepy.streaming import StreamListener
 import time
+from easygui import *
 
 #keys and token for api acess
 consumer_key = 'UPI6kKkPaNIHoj8a2AafnhIEA'
@@ -37,14 +38,14 @@ class MyListener(StreamListener):
     def __init__(self):
         #self.num_tweets = 0;
         self.start_time = time.time()
-        self.limit = 1800;
-        file_f = open('python_tem.json', 'w')
+        self.limit = 2;
+        file_f = open('python_temp.json', 'w')
         file_f.truncate()
         file_f.close()
 
     def on_data(self,data):
         try:
-            with open('mcdonalds.json','a') as f:
+            with open('python_temp.json','a') as f:
                 if ((time.time() - self.start_time) < self.limit):
                     f.write(data)
                     return True
@@ -61,6 +62,7 @@ class MyListener(StreamListener):
         return True
 
 filter_str = str(input("which filter?..."))
+#filter_str = str(enterbox("Which filter "))
 #makes a new stream object
 
 twitter_stream = Stream(auth,MyListener())

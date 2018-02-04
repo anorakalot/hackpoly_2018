@@ -24,51 +24,51 @@ def pre_process(s):
 
 #makes a list of all string punctuations plus some other things that have no meaning in tweets
 punctuation = list(string.punctuation)
-other_unimportants = ['rt','via','Via','RT','、','、' , '…','」','...','’','「','️','。','“','”','🇷','🇺','__','『','ा']
-
-def terms():
-    print('\n' + "10 most common terms ")
-    #opens any json file and gives the 5 most common terms and the number of times they appear
-    with open(file_to_open,'r') as f:
-        #to make dictianry with number of times a token appears
-        count_all_minus_stop = Counter()
-        count_all_terms = Counter()
-        for line in f:
-            #loads a line from the json file
-            tweet = json.loads(line);
-            #makes it so it only concerns itself witht the text part of the json line
-            if 'text' in tweet:
-                tweet = tweet["text"]
-            else:
-                tweet = ""
-            #list of things that should not count as important words telling us about public sentiment
-            stop = list(stopwords.words('english')) + punctuation+ other_unimportants
-
-            terms_all = [term for term in pre_process(tweet)]
-
-            #makes a list of all the tokens  - most stopwords and puncutation and other nonmeaning things
-
-            terms_all_minus_stop = [term for term in pre_process(tweet) if term not in stop and not term.startswith(('#','@','@','@','http:','https:'))]
-
-            #bigram for two words at the opposite ends of things in the stop list
-            #terms_bigram = bigrams(stop)
+other_unimportants = ['rt','via','Via','RT','、','、' , '…','」','...','’','「','️','。','“','”','🇷','🇺','__','『','ा','..']
 
 
-            #dont know what this does
-            #terms_single = set(terms_all_minus_stop)
+print('\n' + "10 most common terms ")
+#opens any json file and gives the 5 most common terms and the number of times they appear
+with open(file_to_open,'r') as f:
+    #to make dictianry with number of times a token appears
+    count_all_minus_stop = Counter()
+    count_all_terms = Counter()
+    for line in f:
+        #loads a line from the json file
+        tweet = json.loads(line);
+        #makes it so it only concerns itself witht the text part of the json line
+        if 'text' in tweet:
+            tweet = tweet["text"]
+        else:
+            tweet = ""
+        #list of things that should not count as important words telling us about public sentiment
+        stop = list(stopwords.words('english')) + punctuation+ other_unimportants
 
-            #makes a dicionary with the token and the value being how many times its been said
+        terms_all = [term for term in pre_process(tweet)]
 
-            #count_all.update(terms_single)
-            count_all_terms.update(terms_all)
-            count_all_minus_stop.update(terms_all_minus_stop)
+        #makes a list of all the tokens  - most stopwords and puncutation and other nonmeaning things
 
-            #count_all.update(terms_all)
+        terms_all_minus_stop = [term for term in pre_process(tweet) if term not in stop and not term.startswith(('#','@','@','@')) and  term[0:5] != 'https'] #and 'https:' not in term)]
 
-            #this line below takes tweet text and turns it into "tokens" of words
-            #tokens = pre_process(tknzr.tokenize(tweet['text']))
-        print(count_all_minus_stop.most_common(10))
-        f.close()
+        #bigram for two words at the opposite ends of things in the stop list
+        #terms_bigram = bigrams(stop)
+
+
+        #dont know what this does
+        #terms_single = set(terms_all_minus_stop)
+
+        #makes a dicionary with the token and the value being how many times its been said
+
+        #count_all.update(terms_single)
+        count_all_terms.update(terms_all)
+        count_all_minus_stop.update(terms_all_minus_stop)
+
+        #count_all.update(terms_all)
+
+        #this line below takes tweet text and turns it into "tokens" of words
+        #tokens = pre_process(tknzr.tokenize(tweet['text']))
+    print(count_all_minus_stop.most_common(10))
+    f.close()
 
 
 print('\n' + "10 most common hashtags ")
@@ -111,7 +111,7 @@ with open(file_to_open,'r') as f:
             tweet = tweet["text"]
         else:
             tweet = ""
-        terms_only = [term for term in pre_process(tweet) if term not in stop and not term.startswith(('#','&','@'))]
+        terms_only = [term for term in pre_process(tweet) if term not in stop and not term.startswith(('#','&','@')) and  term[0:5] != 'https']
         #builds matrix if in terms_only w1 and w2 are not equal
 
         for i in range(len(terms_only)-1):
@@ -137,7 +137,7 @@ negative_vocab = []
 # n_docs is the total n. of tweets
 p_t = {}
 p_t_com = defaultdict(lambda : defaultdict(int))
-n_docs = sum(1 for line in open('python_10.json'))
+n_docs = sum(1 for line in open(file_to_open))
 for term, n in count_all_terms.items():
     #p(t) = DF(t)/|D|
     p_t[term] = n / n_docs
@@ -178,13 +178,14 @@ for t1 in p_t:
         denom = p_t[t1] * p_t[t2]
         pmi[t1][t2] = math.log2(p_t_com[t1][t2]/denom)
 
+#makes the semantic_orientation dictianry difference between closeness of positive_vocab and negative_vocab
 semantic_orientation = {}
 for term , n in p_t.items():
     positive_assoc = sum(pmi[term][tx] for tx in positive_vocab)
     negative_assoc = sum(pmi[term][tx] for tx in negative_vocab)
     semantic_orientation[term] = positive_assoc - negative_assoc
 
-
+#sort the semantic_orientation dictionary
 semantic_sorted = sorted(semantic_orientation.items(),key = operator.itemgetter(1),reverse = True)
 top_pos = semantic_sorted[:10]
 top_neg = semantic_sorted[-10:]
