@@ -20,6 +20,8 @@ import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
+
+
 #keys and token for api acess
 consumer_key = 'UPI6kKkPaNIHoj8a2AafnhIEA'
 consumer_secret = 'Q0CeA7L3X5fFNzSeJe3KJ5sbASHI9BeigltrD8NBbcvYpZUoee'
@@ -135,7 +137,7 @@ def print_data(file_to_open):
 
             #makes a list of all the tokens  - most stopwords and puncutation and other nonmeaning things
 
-            terms_all_minus_stop = [convert65536(term) for term in pre_process(tweet) if term not in stop and not term.startswith(('#','@','@','@')) and  term[0:5] != 'https' ] #and 'https:' not in term)]
+            terms_all_minus_stop = [convert65536(term) for term in pre_process(tweet) if term not in stop and not term.startswith(('#','@','@','@','{','{')) and  term[0:5] != 'https']#and term != filter_str] #and 'https:' not in term)]
 
             #bigram for two words at the opposite ends of things in the stop list
             #terms_bigram = bigrams(stop)
@@ -155,6 +157,9 @@ def print_data(file_to_open):
             #this line below takes tweet text and turns it into "tokens" of words
             #tokens = pre_process(tknzr.tokenize(tweet['text']))
         str_1 = str(count_all_minus_stop.most_common(10))
+
+        convert65536(str_1)
+        print (str_1)
         msgbox(str_1,title)
         #str_2 = str_2.strip['[]']
         f.close()
@@ -217,7 +222,7 @@ def print_data(file_to_open):
                 tweet = tweet["text"]
             else:
                 tweet = ""
-            terms_only = [term for term in pre_process(tweet) if term not in stop and not term.startswith(('#','&','@')) and  term[0:5] != 'https']
+            terms_only = [term for term in pre_process(tweet) if term not in stop and not term.startswith(('#','&','@','{')) and  term[0:5] != 'https']#and term != filter_str]
             #terms_only = [term for term in pre_process(tweet) if term not in stop and not term.startswith(('&','@')) and  term[0:5] != 'https']
             #builds matrix if in terms_only w1 and w2 are not equal
 
@@ -242,7 +247,7 @@ def print_data(file_to_open):
         title_3 = convert65536(title_3)
         msgbox(str_3,title_3)
 
-
+        '''
         tuple_term = list(zip(*term_max[:10]))[0]
 
         count_occurences = list(zip(*term_max[:10]))[1]
@@ -252,7 +257,7 @@ def print_data(file_to_open):
         plt.xticks(x_position,tuple_term)
         plt.ylabel("Occurences")
         plt.show()
-
+        '''
         '''
         plt.bar(range(len(term_max[:10])),list(term_max[:10].values()),align = 'center')
         plt.xticks(range(len(term_max[:10])),list(dict(count_all_minus_stop.most_common(10)).keys()))
@@ -283,8 +288,6 @@ def print_data(file_to_open):
         for line in f:
             line = line.rstrip('\n')
             negative_vocab.append(line)
-
-
 
     '''
     file_neg = open("negative-words.txt")
@@ -333,6 +336,7 @@ def print_data(file_to_open):
     str_5 = str(top_neg)
     msgbox(str_5,title_5)
 
+
     neg_term = list(zip(*top_neg))[0]
     neg_rating = list(zip(*top_neg))[1]
     x_position = np.arange(len(neg_term))
@@ -342,6 +346,7 @@ def print_data(file_to_open):
     plt.show()
 
 
+    '''
     with open(file_to_open,'r') as f:
         geo_data = {
         "type": "FeatureCollection",
@@ -362,8 +367,7 @@ def print_data(file_to_open):
     with open('geo_data.json','w') as fout:
         fout.write(json.dumps(geo_data, indent = 4))
         print("geo data json being written")
-
-
+        '''
 choice = "dummy_value"
 while(choice != "exit"):
     msg = "What do you want to do"
@@ -376,7 +380,11 @@ while(choice != "exit"):
         filter_str = str(enterbox("Which filter for your new_stream "))
         file_to_make_stream = str(enterbox("name of new file? (Beware adding in the same string for a previously existing file will erase that file!)"))
         #makes a new stream object
-        time_limit = int(enterbox("Please enter seconds to make for your new tweet stream "))
+        try:
+            time_limit = int(enterbox("Please enter seconds to make for your new tweet stream "))
+        except ValueError:
+            msgbox("Wrong type of value time limit is set to 10 seconds")
+            time_limit = 10;
         msg = "Do you want to continue?"
         title = "Please Confirm"
         if ccbox(msg, title):     # show a Continue/Cancel dialog
@@ -401,19 +409,19 @@ while(choice != "exit"):
                 print_data(file_to_open)
                 checker = False
 
+
     elif (choice == "look_at_json_files"):
         checker = True
         while checker:
             file_to_look_at = str(enterbox("Which json file do you want to look at "))
-            if enterbox():
-                if(os.path.isfile(file_to_look_at) != True):
+
+            if(os.path.isfile(file_to_look_at) != True):
                     msgbox("not a valid json file name")
-                else:
-                    filename = os.path.normcase(file_to_look_at)
-                    f = open(filename, "r")
-                    text = f.readlines()
-                    f.close()
-                    codebox(text)
                     checker = False
             else:
-                checker=False
+                filename = os.path.normcase(file_to_look_at)
+                f = open(filename, "r")
+                text = f.readlines()
+                f.close()
+                codebox(text)
+                checker = False
